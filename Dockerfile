@@ -8,6 +8,18 @@ RUN set -eux; \
   tar xf perl.tar.gz; \
   :
 
+# If you use some XS modules, and they will be linked to some shared objects,
+# you may want to install libXXX-dev APT packages here.
+#
+# **NOTE**
+# buildpack-deps:bullseye already have libssl-dev package,
+# so you do not need to install libssl-dev for Net::SSLeay
+#
+# RUN set -eux; \
+#   apt-get update; \
+#   apt-get install -y --no-install-recommends libxml2-dev; \
+#   :
+
 COPY cpanfile /app/cpanfile
 RUN set -eux; \
   export PATH=/opt/perl/bin:$PATH; \

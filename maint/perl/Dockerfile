@@ -5,6 +5,9 @@ ARG PERL_VERSION=5.34.0
 ADD https://www.cpan.org/src/5.0/perl-$PERL_VERSION.tar.gz perl-$PERL_VERSION.tar.gz
 
 RUN tar xf perl-$PERL_VERSION.tar.gz
+
+# You may want to append more configure options,
+# such as -Duseshrplib, -Duseithreads, -DDEBUGGING=-g
 RUN set -eux; \
   cd perl-$PERL_VERSION; \
   ./Configure \
