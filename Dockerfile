@@ -48,6 +48,14 @@ FROM debian:bullseye
 #   rm -rf /var/lib/apt/lists/*; \
 #   :
 
+# If you want to change timezone (say Asia/Tokyo), then:
+#
+# RUN set -eux; \
+#   echo Asia/Tokyo > /etc/timezone; \
+#   rm -f /etc/localtime; \
+#   dpkg-reconfigure -f noninteractive tzdata; \
+#   :
+
 COPY --from=deps /opt/perl /opt/perl
 COPY --from=deps /sbin/tini /sbin/tini
 COPY --from=deps /app/local /app/local
