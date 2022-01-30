@@ -4,18 +4,22 @@ This repository gives a sample Dockerfile for perl applications.
 
 # Description
 
+Everything are in [Dockerfile](Dockerfile).
+
+To help understand what Dockerfile does, I will add some comments:
+
 ### (0) First, build perl once, and upload it to somewhere.
 
 I don't think we should build perl from source code in the main Dockerfile;
 instead, just build perl once, and upload it to somewhere accessible via HTTP.
 
-In this sample, I built perl as in [maint/perl/Dockerfile](), and upload it to [GitHub Releases](https://github.com/skaji/perl-dockerfile-sample/releases/tag/v0.0.1).
+In this sample, I built perl as in [maint/perl/Dockerfile](maint/perl/Dockerfile), and upload it to [GitHub Releases](https://github.com/skaji/perl-dockerfile-sample/releases/tag/v0.0.1).
 
-```
-cd maint/perl
-docker build -t perl-build .
-ID=$(docker create perl-build)
-docker cp $ID:/perl.tar.gz .
+```console
+❯ cd maint/perl
+❯ docker build -t perl-build .
+❯ ID=$(docker create perl-build)
+❯ docker cp $ID:/perl.tar.gz .
 # upload perl.tar.gz to somewhere
 ```
 
@@ -34,11 +38,11 @@ RUN set -eux; \
   :
 ```
 
-We here use [cpanfile]() for describing dependencies, and [cpm](https://github.com/skaji/cpm) for installing dependencies.
+We here use [cpanfile](cpanfile) for describing dependencies, and [cpm](https://github.com/skaji/cpm) for installing dependencies.
 
 ### (2) Copy necessary files to the "final" stage
 
-```
+```Dockerfile
 FROM debian:bullseye
 
 COPY --from=deps /opt/perl /opt/perl
@@ -55,14 +59,14 @@ We here use `debian:bullseye` for base image.
 We have installed the dependencies into `/app/local`,
 so we should append the directory to `@INC`:
 
-```
+```Dockerfile
 ENV PATH /app/local/bin:/opt/perl/bin:$PATH
 ENV PERL5LIB /app/lib:/app/local/lib/perl5
 ```
 
 ### (4) Set ENTRYPOINT and CMD for your applications
 
-```
+```Dockerfile
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["plackup", "--server", "Starlet", "--port", "8080", "app.psgi"]
 ```
@@ -78,10 +82,10 @@ so I think we should set `tini` as `ENTRYPOINT` explicitly.
 
 # Try it
 
-The image built by [Dockerfile]() is uploaded to [ghcr.io](https://github.com/skaji/perl-dockerfile-sample/pkgs/container/perl-dockerfile-sample).
+The image built by [Dockerfile](Dockerfile) is uploaded to [ghcr.io](https://github.com/skaji/perl-dockerfile-sample/pkgs/container/perl-dockerfile-sample).
 So you can easily try it on your local machine:
 
-```
+```console
 ❯ docker run -p 8080:8080 ghcr.io/skaji/perl-dockerfile-sample:v0.0.2
 Plack::Handler::Starlet: Accepting connections at http://0:8080/
 
@@ -94,9 +98,9 @@ Hello world!
 * [dockerfile_best-practices](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
 covers recommended best practices and methods for building efficient images.
 * I didn't use `USER` to change to a non-root user. I'm not sure it is worth doing so.
-* If you want to reduce the size of your image more, then you can try
+* If you want to reduce the size of your image more, then you may want to look at
 [alpine](https://hub.docker.com/_/alpine) or
-[distroless](https://github.com/GoogleContainerTools/distroless).
+[distroless](https://github.com/GoogleContainerTools/distroless) images.
 * Leave your comment on [Discussions](https://github.com/skaji/perl-dockerfile-sample/discussions)!
 
 # Author
