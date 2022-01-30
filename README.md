@@ -13,13 +13,14 @@ To help understand what Dockerfile does, I will add some comments:
 I don't think we should build perl from source code in the main Dockerfile;
 instead, just build perl once, and upload it to somewhere accessible via HTTP.
 
-In this sample, I built perl as in [maint/perl/Dockerfile](maint/perl/Dockerfile), and upload it to [GitHub Releases](https://github.com/skaji/perl-dockerfile-sample/releases/tag/v0.0.1).
+In this sample, I built perl as in [maint/build-perl/Dockerfile](maint/build-perl/Dockerfile), and upload it to [GitHub Releases](https://github.com/skaji/perl-dockerfile-sample/releases/tag/v0.0.1).
 
 ```console
-❯ cd maint/perl
-❯ docker build -t perl-build .
-❯ ID=$(docker create perl-build)
+❯ cd maint/build-perl
+❯ docker build -t build-perl .
+❯ ID=$(docker create build-perl)
 ❯ docker cp $ID:/perl.tar.gz .
+❯ docker rm $ID
 # upload perl.tar.gz to somewhere
 ```
 
@@ -33,8 +34,10 @@ FROM buildpack-deps:bullseye as deps
 
 COPY cpanfile /app/cpanfile
 RUN set -eux; \
+  curl -fsSL -o /tmp/cpm https://git.io/cpm
+  export PATH=/opt/perl/bin:$PATH; \
   cd /app; \
-  curl -fsSL https://git.io/cpm | perl - install --show-build-log-on-failure; \
+  perl /tmp/cpm install --show-build-log-on-failure; \
   :
 ```
 

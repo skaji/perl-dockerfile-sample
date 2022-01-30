@@ -1,7 +1,5 @@
 FROM buildpack-deps:bullseye as deps
 
-ARG TINI_VERSION=v0.19.0
-
 ADD https://github.com/skaji/perl-dockerfile-sample/releases/download/v0.0.1/perl.tar.gz /opt/
 RUN set -eux; \
   cd /opt; \
@@ -22,11 +20,13 @@ RUN set -eux; \
 
 COPY cpanfile /app/cpanfile
 RUN set -eux; \
+  curl -fsSL -o /tmp/cpm https://git.io/cpm
   export PATH=/opt/perl/bin:$PATH; \
   cd /app; \
-  curl -fsSL https://git.io/cpm | perl - install --show-build-log-on-failure; \
+  perl /tmp/cpm install --show-build-log-on-failure; \
   :
 
+ARG TINI_VERSION=v0.19.0
 RUN set -eux; \
   curl -fsSL -o /sbin/tini https://github.com/krallin/tini/releases/download/$TINI_VERSION/tini-amd64; \
   chmod +x /sbin/tini; \
